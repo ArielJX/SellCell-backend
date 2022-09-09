@@ -1,5 +1,6 @@
 const express = require('express');
-const User = require("./User");
+const UserMessage = require("./UserMessages");
+const UserProfile = require('./UserProfile')
 const Product = require("./Product");
 const mongoose = require('mongoose');
 const app = express();
