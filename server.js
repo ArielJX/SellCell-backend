@@ -15,8 +15,8 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true }, fun
 mongoose.connection.on("error", function (e) {console.log(e)})
 mongoose.connection.on("connected", function (e) {console.log("successfully connected to database")})
 
-app.get('/user', (req, res) => {
-    User.find({}, function (error, result) {
+app.get('/userProfile', (req, res) => {
+    UserProfile.find({}, function (error, result) {
         if (error) {
             console.log(error);
         } else {
@@ -36,10 +36,18 @@ app.get('/products', (req, res) => {
     });
 
 
-app.post('/userpost', (req, res) => {
-    const user = new User;
-    user.save();
-    res.json(user);
+app.post('/userMessage', (req, res) => {
+    const message = new UserMessage(req.body);
+
+    message.save()
+    .then((result) => {
+        res.redirect('/userMessage'); 
+    })
+    .catch((err) => {
+        console.log(err)
+    }) 
+    res.json(message);
+    console.log(req.body);
 })
 
 
