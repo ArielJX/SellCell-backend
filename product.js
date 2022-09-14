@@ -1,11 +1,9 @@
-const { urlencoded } = require('express');
 const mongoose = require('mongoose');
 
 
 
 const productSchema = new mongoose.Schema({
     name: String,
-    brand: String,
     price: Number,
     description: String,
     // image: url,
