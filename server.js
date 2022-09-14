@@ -5,12 +5,13 @@ const Product = require("./product");
 const mongoose = require('mongoose');
 const app = express();
 const cors = require("cors");
+const { db } = require('./product');
 const bcrypt = require('bcryptjs');
 
 
 app.use(cors());
 app.use(express.json())
-app.use(express.urlencoded({ extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
 
 const dbURI = 'mongodb+srv://graceyoobee:crystal123@nodetuts.elfpghz.mongodb.net/node-tuts?retryWrites=true&w=majority';
@@ -26,8 +27,8 @@ app.get('/userProfile', (req, res) => {
         } else {
             res.json(result);
         }
-    }) 
-    });
+    })
+});
 
 app.get('/products', (req, res) => {
     Product.find({}, function (error, result) {
@@ -36,9 +37,25 @@ app.get('/products', (req, res) => {
         } else {
             res.json(result);
         }
-    }) 
-    });
+    })
+});
 
+app.get('/products/:id', (req, res) => {
+    Product.findById(req.params.id, function (err, docs) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            res.json(docs);
+        }
+    });
+});
+
+app.post('/userpost', (req, res) => {
+    const user = new User;
+    user.save();
+    res.json(user);
+});
 app.get('/userMessage', (req, res) => {
     UserMessage.find({}, function (error, result) {
         if (error) {
@@ -67,17 +84,24 @@ app.post('/userMessage', (req, res) => {
 
 app.post('/products', (req, res) => {
     const product = new Product(req.body);
-
-    product.save()
-    .then((result) => {
-        res.redirect('/products'); 
+    product.save().then(function () {
+        res.json(product);
     })
-    .catch((err) => {
-        console.log(err)
-    }) 
-    res.json(product);
-    console.log(req.body);
-})
+});
+
+app.put('/products/:id', (req, res) => {
+    Product.findByIdAndUpdate({ _id: req.params.id }, req.body).then(function () {
+        Product.findOne({ _id: req.params.id }).then(function (product) {
+            res.send(product);
+        })
+    });
+});
+
+app.delete('/products/:id', (req, res) => {
+    Product.findByIdAndRemove({ _id: req.params.id }).then(function (product) {
+        res.send(product);
+    });
+});
 
 
 app.get('/products', (req, res) => {
