@@ -56,6 +56,7 @@ app.post('/userpost', (req, res) => {
     user.save();
     res.json(user);
 });
+
 app.get('/userMessage', (req, res) => {
     UserMessage.find({}, function (error, result) {
         if (error) {
@@ -101,17 +102,6 @@ app.delete('/products/:id', (req, res) => {
     Product.findByIdAndRemove({ _id: req.params.id }).then(function (product) {
         res.send(product);
     });
-});
-
-
-app.get('/products', (req, res) => {
-    Product.find({}, function (error, result) {
-        if (error) {
-            console.log(error);
-        } else {
-            res.json(result);
-        }
-    })
 });
 
 
