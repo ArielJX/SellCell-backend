@@ -40,6 +40,17 @@ app.get('/products', (req, res) => {
     })
 });
 
+app.get('/products/:id', (req, res) => {
+    Product.findById(req.params.id, function (err, docs) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            res.json(docs);
+        }
+    });
+});
+
 app.post('/userpost', (req, res) => {
     const user = new User;
     user.save();
@@ -54,6 +65,7 @@ app.get('/userMessage', (req, res) => {
         }
     })
 });
+
 
 app.post('/userMessage', (req, res) => {
     const message = new UserMessage(req.body);
@@ -72,7 +84,6 @@ app.post('/userMessage', (req, res) => {
 
 app.post('/products', (req, res) => {
     const product = new Product(req.body);
-
     product.save().then(function () {
         res.json(product);
     })
@@ -138,7 +149,6 @@ app.post('/register', (req, res) => {
             });
         }
     })
-
     //check for the Unique Email
     UserProfile.findOne({
         email: email
@@ -176,13 +186,4 @@ app.post('/register', (req, res) => {
             });
         });
     });
-});
-
-app.delete("profile/:id", (req, res) => {
-    console.log(req.params.id);
-
-})
-
-app.listen(3000, () => {
-    console.log("listening on port 3000");
 });
