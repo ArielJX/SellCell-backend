@@ -104,17 +104,6 @@ app.delete('/products/:id', (req, res) => {
 });
 
 
-app.get('/products', (req, res) => {
-    Product.find({}, function (error, result) {
-        if (error) {
-            console.log(error);
-        } else {
-            res.json(result);
-        }
-    }) 
-    });
-
-
 app.get('/register', (req, res) => {
         UserProfile.find({}, function (error, result) {
             if (error) {
