@@ -5,6 +5,7 @@ const Product = require("./product");
 const mongoose = require('mongoose');
 const app = express();
 const cors = require("cors");
+const { db } = require('./product');
 const bcrypt = require('bcryptjs');
 
 
@@ -39,6 +40,11 @@ app.get('/products', (req, res) => {
     })
 });
 
+app.post('/userpost', (req, res) => {
+    const user = new User;
+    user.save();
+    res.json(user);
+});
 app.get('/userMessage', (req, res) => {
     UserMessage.find({}, function (error, result) {
         if (error) {
@@ -67,16 +73,24 @@ app.post('/userMessage', (req, res) => {
 app.post('/products', (req, res) => {
     const product = new Product(req.body);
 
-    product.save()
-        .then((result) => {
-            res.redirect('/products');
+    product.save().then(function () {
+        res.json(product);
+    })
+});
+
+app.put('/products/:id', (req, res) => {
+    Product.findByIdAndUpdate({ _id: req.params.id }, req.body).then(function () {
+        Product.findOne({ _id: req.params.id }).then(function (product) {
+            res.send(product);
         })
-        .catch((err) => {
-            console.log(err)
-        })
-    res.json(product);
-    console.log(req.body);
-})
+    });
+});
+
+app.delete('/products/:id', (req, res) => {
+    Product.findByIdAndRemove({ _id: req.params.id }).then(function (product) {
+        res.send(product);
+    });
+});
 
 
 app.get('/products', (req, res) => {
