@@ -7,29 +7,22 @@ const app = express();
 const cors = require("cors");
 const { db } = require('./product');
 const bcrypt = require('bcryptjs');
+const bodyParser = require('body-parser');
 
 
 app.use(cors());
 app.use(express.json())
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 
-const dbURI = 'mongodb+srv://graceyoobee:crystal123@nodetuts.elfpghz.mongodb.net/node-tuts?retryWrites=true&w=majority';
+const dbURI = 'mongodb+srv://crystalyoobee:stolensummer@cluster0.inblp12.mongodb.net/?retryWrites=true&w=majority';
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true }, function () { console.log("connection attempt") })
 mongoose.connection.on("error", function (e) { console.log(e) })
 mongoose.connection.on("connected", function (e) { console.log("successfully connected to database") })
 
 
-app.get('/userProfile', (req, res) => {
-    UserProfile.find({}, function (error, result) {
-        if (error) {
-            console.log(error);
-        } else {
-            res.json(result);
-        }
-    })
-});
 
+//Show all product lists
 app.get('/products', (req, res) => {
     Product.find({}, function (error, result) {
         if (error) {
@@ -40,6 +33,20 @@ app.get('/products', (req, res) => {
     })
 });
 
+
+
+//List a product
+app.post('/products', (req, res) => {
+    const product = new Product(req.body);
+    product.save().then(function () {
+        res.json(product);
+    })
+});
+
+
+
+
+//Find One product I clicked 
 app.get('/products/:id', (req, res) => {
     Product.findById(req.params.id, function (err, docs) {
         if (err) {
@@ -51,11 +58,52 @@ app.get('/products/:id', (req, res) => {
     });
 });
 
-app.post('/userpost', (req, res) => {
-    const user = new User;
-    user.save();
-    res.json(user);
+
+
+
+//find and Update product
+app.put('/products/:id', (req, res) => {
+    Product.findByIdAndUpdate({ _id: req.params.id }, req.body).then(function () {
+        Product.findOne({ _id: req.params.id }).then(function (product) {
+            res.send(product);
+        })
+    });
 });
+//find and Delete product
+app.delete('/products/:id', (req, res) => {
+    Product.findByIdAndRemove({ _id: req.params.id }).then(function (product) {
+        res.send(product);
+    });
+});
+
+
+
+
+
+//Search engine- find product that users want
+app.post('/findproducts', bodyParser.urlencoded({ extended: false }), (req, res) => {
+    //  find all itmes that match
+     Product.find({
+        brand: req.body.brand,
+        location: req.body.location,
+        price: req.body.price
+    })
+    .then(item => {
+        if (item){
+            return res.json(item);
+        }
+     })
+     .catch((err) => {
+        console.log(err)
+    }) 
+    console.log(req.body)
+});
+
+
+
+
+
+//View all messages
 
 app.get('/userMessage', (req, res) => {
     UserMessage.find({}, function (error, result) {
@@ -68,6 +116,9 @@ app.get('/userMessage', (req, res) => {
 });
 
 
+
+
+//Send a message
 app.post('/userMessage', (req, res) => {
     const message = new UserMessage(req.body);
 
@@ -82,27 +133,22 @@ app.post('/userMessage', (req, res) => {
     console.log(req.body);
 })
 
-
-app.post('/products', (req, res) => {
-    const product = new Product(req.body);
-    product.save().then(function () {
-        res.json(product);
+//Show all userprofiles
+app.get('/userProfile', (req, res) => {
+    UserProfile.find({}, function (error, result) {
+        if (error) {
+            console.log(error);
+        } else {
+            res.json(result);
+        }
     })
 });
 
-app.put('/products/:id', (req, res) => {
-    Product.findByIdAndUpdate({ _id: req.params.id }, req.body).then(function () {
-        Product.findOne({ _id: req.params.id }).then(function (product) {
-            res.send(product);
-        })
-    });
-});
 
-app.delete('/products/:id', (req, res) => {
-    Product.findByIdAndRemove({ _id: req.params.id }).then(function (product) {
-        res.send(product);
-    });
-});
+
+
+//Show all registratiions
+
 
 
 app.get('/register', (req, res) => {
@@ -116,13 +162,11 @@ app.get('/register', (req, res) => {
 });
 
 
+
+
+//Register a user with unique details 
 app.post('/register', (req, res) => {
-    let {
-        username,
-        email,
-        password,
-        confirm_password
-    } = req.body
+
     if (password !== confirm_password) {
         return res.status(400).json({
             msg: "Password do not match."
@@ -131,7 +175,7 @@ app.post('/register', (req, res) => {
 
     //Check for the unique Username
     UserProfile.findOne({
-        username: username
+        username: req.body.username
     }).then(user => {
         if (user) {
             return res.status(400).json({
@@ -141,7 +185,7 @@ app.post('/register', (req, res) => {
     })
     //check for the Unique Email
     UserProfile.findOne({
-        email: email
+        email: req.body.email
     }).then(user => {
         if (user) {
             return res.status(400).json({
