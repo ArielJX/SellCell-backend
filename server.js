@@ -2,7 +2,6 @@ const express = require('express');
 const UserMessage = require("./userMessage");
 const UserProfile = require('./userProfile')
 const Product = require("./product");
-const homeList = require("./homeList");
 const mongoose = require('mongoose');
 const app = express();
 const cors = require("cors");
@@ -29,17 +28,6 @@ app.get('/userProfile', (req, res) => {
         }
     })
 });
-
-app.get('/homeList', (req, res) => {
-    Product.find({}, function (error, result) {
-        if (error) {
-            console.log(error);
-        } else {
-            res.json(result);
-        }
-    })
-});
-
 
 app.get('/products', (req, res) => {
     Product.find({}, function (error, result) {
