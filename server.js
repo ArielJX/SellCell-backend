@@ -69,10 +69,6 @@ app.put('/products/:id', (req, res) => {
         })
     });
 });
-
-
-
-
 //find and Delete product
 app.delete('/products/:id', (req, res) => {
     Product.findByIdAndRemove({ _id: req.params.id }).then(function (product) {
@@ -108,6 +104,7 @@ app.post('/findproducts', bodyParser.urlencoded({ extended: false }), (req, res)
 
 
 //View all messages
+
 app.get('/userMessage', (req, res) => {
     UserMessage.find({}, function (error, result) {
         if (error) {
@@ -136,9 +133,6 @@ app.post('/userMessage', (req, res) => {
     console.log(req.body);
 })
 
-
-
-
 //Show all userprofiles
 app.get('/userProfile', (req, res) => {
     UserProfile.find({}, function (error, result) {
@@ -154,6 +148,9 @@ app.get('/userProfile', (req, res) => {
 
 
 //Show all registratiions
+
+
+
 app.get('/register', (req, res) => {
     UserProfile.find({}, function (error, result) {
         if (error) {
