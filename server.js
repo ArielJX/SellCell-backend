@@ -5,7 +5,6 @@ const Product = require("./product");
 const mongoose = require('mongoose');
 const app = express();
 const cors = require("cors");
-const { db } = require('./product');
 const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 
@@ -15,7 +14,7 @@ app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
-const dbURI = 'mongodb+srv://crystalyoobee:stolensummer@cluster0.inblp12.mongodb.net/?retryWrites=true&w=majority';
+const dbURI = 'mongodb+srv://crystalyoobee:newnew@cluster0.inblp12.mongodb.net/?retryWrites=true&w=majority';
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true }, function () { console.log("connection attempt") })
 mongoose.connection.on("error", function (e) { console.log(e) })
 mongoose.connection.on("connected", function (e) { console.log("successfully connected to database") })
@@ -69,10 +68,13 @@ app.put('/products/:id', (req, res) => {
         })
     });
 });
+
+
+
 //find and Delete product
 app.delete('/products/:id', (req, res) => {
     Product.findByIdAndRemove({ _id: req.params.id }).then(function (product) {
-        res.send(product);
+        res.json(product);
     });
 });
 
@@ -81,7 +83,7 @@ app.delete('/products/:id', (req, res) => {
 
 
 //Search engine- find product that users want
-app.post('/findproducts', bodyParser.urlencoded({ extended: false }), (req, res) => {
+app.post('/findproducts', (req, res) => {
     //  find all itmes that match
      Product.find({
         brand: req.body.brand,
@@ -133,33 +135,8 @@ app.post('/userMessage', (req, res) => {
     console.log(req.body);
 })
 
-//Show all userprofiles
-app.get('/userProfile', (req, res) => {
-    UserProfile.find({}, function (error, result) {
-        if (error) {
-            console.log(error);
-        } else {
-            res.json(result);
-        }
-    })
-});
 
 
-
-
-//Show all registratiions
-
-
-
-app.get('/register', (req, res) => {
-    UserProfile.find({}, function (error, result) {
-        if (error) {
-            console.log(error);
-        } else {
-            res.json(result);
-        }
-    })
-});
 
 
 
@@ -167,7 +144,7 @@ app.get('/register', (req, res) => {
 //Register a user with unique details 
 app.post('/register', (req, res) => {
 
-    if (password !== confirm_password) {
+    if (req.body.password !== req.body.confirm_password) {
         return res.status(400).json({
             msg: "Password do not match."
         });
@@ -198,7 +175,7 @@ app.post('/register', (req, res) => {
 
     newUser.save()
         .then((result) => {
-            res.redirect('/login');
+            console.log('register successful')
         })
         .catch((err) => {
             console.log(err)
