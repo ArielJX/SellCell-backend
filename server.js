@@ -7,6 +7,9 @@ const app = express();
 const cors = require("cors");
 const { db } = require('./product');
 const bcrypt = require('bcryptjs');
+const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
 
 
 app.use(cors());
@@ -14,10 +17,25 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
 
-const dbURI = 'mongodb+srv://graceyoobee:crystal123@nodetuts.elfpghz.mongodb.net/node-tuts?retryWrites=true&w=majority';
+const dbURI = 'mongodb+srv://@cluster0.pg9lbmp.mongodb.net/?retryWrites=true&w=majority';
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true }, function () { console.log("connection attempt") })
 mongoose.connection.on("error", function (e) { console.log(e) })
 mongoose.connection.on("connected", function (e) { console.log("successfully connected to database") })
+
+
+//set up multer
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: function(req, file, cb) {
+            cb(null, './uploads');
+        },
+        filename: function(req, file, cb) {
+            cb(null, file.originalname);
+        },
+    }),
+    limits: {fileSize: 5424880},
+});
+
 
 
 app.get('/userProfile', (req, res) => {
@@ -37,7 +55,7 @@ app.get('/products', (req, res) => {
         } else {
             res.json(result);
         }
-    })
+    }).lean();
 });
 
 app.get('/products/:id', (req, res) => {
@@ -48,7 +66,7 @@ app.get('/products/:id', (req, res) => {
         else {
             res.json(docs);
         }
-    });
+    }).lean();
 });
 
 app.post('/userpost', (req, res) => {
@@ -79,20 +97,30 @@ app.post('/userMessage', (req, res) => {
             console.log(err)
         })
     res.json(message);
-    console.log(req.body);
 })
 
 
-app.post('/products', (req, res) => {
-    const product = new Product(req.body);
+app.post('/products', upload.single('image'), (req, res) => {
+    const product = new Product({
+        name: req.body.name,
+        brand: req.body.brand,
+        price: req.body.price,
+        description: req.body.description,
+        image: {
+            data: fs.readFileSync(path.join('./uploads/' + req.file.filename)),
+            contentType: 'image/png',
+        },
+        location: req.body.location
+    });
     product.save().then(function () {
+        fs.unlinkSync(path.join('./uploads/' + req.file.filename));
         res.json(product);
     })
 });
 
 app.put('/products/:id', (req, res) => {
     Product.findByIdAndUpdate({ _id: req.params.id }, req.body).then(function () {
-        Product.findOne({ _id: req.params.id }).then(function (product) {
+        Product.findOne({ _id: req.params.id }).lean().then(function (product) {
             res.send(product);
         })
     });
