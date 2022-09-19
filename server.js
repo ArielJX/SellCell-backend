@@ -17,7 +17,7 @@ app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
-const dbURI = 'mongodb+srv://crystalyoobee:newnew@cluster0.inblp12.mongodb.net/?retryWrites=true&w=majority';
+const dbURI = 'mongodb+srv://admin:yoobee123456@cluster0.emeo5tx.mongodb.net/?retryWrites=true&w=majority';
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true }, function () { console.log("connection attempt") })
 mongoose.connection.on("error", function (e) { console.log(e) })
 mongoose.connection.on("connected", function (e) { console.log("successfully connected to database") })
@@ -26,14 +26,14 @@ mongoose.connection.on("connected", function (e) { console.log("successfully con
 //set up multer
 const upload = multer({
     storage: multer.diskStorage({
-        destination: function(req, file, cb) {
+        destination: function (req, file, cb) {
             cb(null, './uploads');
         },
-        filename: function(req, file, cb) {
+        filename: function (req, file, cb) {
             cb(null, file.originalname);
         },
     }),
-    limits: {fileSize: 5424880},
+    limits: { fileSize: 5424880 },
 });
 
 
@@ -112,19 +112,19 @@ app.delete('/products/:id', (req, res) => {
 //Search engine- find product that users want
 app.post('/findproducts', (req, res) => {
     //  find all itmes that match
-     Product.find({
+    Product.find({
         brand: req.body.brand,
         location: req.body.location,
         price: req.body.price
     })
-    .then(item => {
-        if (item){
-            return res.json(item);
-        }
-     })
-     .catch((err) => {
-        console.log(err)
-    }) 
+        .then(item => {
+            if (item) {
+                return res.json(item);
+            }
+        })
+        .catch((err) => {
+            console.log(err)
+        })
     console.log(req.body)
 });
 
