@@ -61,17 +61,6 @@ app.get('/products', (req, res) => {
 
 
 
-//List a product
-app.post('/products', (req, res) => {
-    const product = new Product(req.body);
-    product.save().then(function () {
-        res.json(product);
-    })
-});
-
-
-
-
 //Find One product I clicked 
 app.get('/products/:id', (req, res) => {
     Product.findById(req.params.id, function (err, docs) {
@@ -85,16 +74,6 @@ app.get('/products/:id', (req, res) => {
 });
 
 
-
-
-//find and Update product
-app.put('/products/:id', (req, res) => {
-    Product.findByIdAndUpdate({ _id: req.params.id }, req.body).then(function () {
-        Product.findOne({ _id: req.params.id }).then(function (product) {
-            res.send(product);
-        })
-    });
-});
 
 
 
@@ -113,10 +92,9 @@ app.delete('/products/:id', (req, res) => {
 app.post('/findproducts', (req, res) => {
     //  find all itmes that match
      Product.find({
-        brand: req.body.brand,
-        location: req.body.location,
-        price: req.body.price
-    })
+         $or: [
+         {brand: req.body.brand},{location: req.body.location},{price: req.body.price}]
+    }).lean()
     .then(item => {
         if (item){
             return res.json(item);
@@ -125,7 +103,6 @@ app.post('/findproducts', (req, res) => {
      .catch((err) => {
         console.log(err)
     }) 
-    console.log(req.body)
 });
 
 
@@ -161,7 +138,7 @@ app.post('/userMessage', (req, res) => {
     res.json(message);
 })
 
-
+//list a product
 app.post('/products', upload.single('image'), (req, res) => {
     const product = new Product({
         name: req.body.name,
@@ -180,6 +157,7 @@ app.post('/products', upload.single('image'), (req, res) => {
     })
 });
 
+//edit a post
 app.put('/products/:id', (req, res) => {
     Product.findByIdAndUpdate({ _id: req.params.id }, req.body).then(function () {
         Product.findOne({ _id: req.params.id }).lean().then(function (product) {
