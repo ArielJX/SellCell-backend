@@ -17,7 +17,7 @@ app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
-const dbURI = 'mongodb+srv://admin:yoobee123456@cluster0.emeo5tx.mongodb.net/?retryWrites=true&w=majority';
+const dbURI = 'mongodb+srv://admin:yoobee123456@cluster0.emeo5tx.mongodb.net/CellSell?retryWrites=true&w=majority';
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true }, function () { console.log("connection attempt") })
 mongoose.connection.on("error", function (e) { console.log(e) })
 mongoose.connection.on("connected", function (e) { console.log("successfully connected to database") })
@@ -85,8 +85,6 @@ app.get('/products/:id', (req, res) => {
 });
 
 
-
-
 //find and Update product
 app.put('/products/:id', (req, res) => {
     Product.findByIdAndUpdate({ _id: req.params.id }, req.body).then(function () {
@@ -97,15 +95,12 @@ app.put('/products/:id', (req, res) => {
 });
 
 
-
 //find and Delete product
 app.delete('/products/:id', (req, res) => {
     Product.findByIdAndRemove({ _id: req.params.id }).then(function (product) {
         res.json(product);
     });
 });
-
-
 
 
 
