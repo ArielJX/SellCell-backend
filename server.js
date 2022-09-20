@@ -17,7 +17,7 @@ app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
-const dbURI = 'mongodb+srv://netninja:test1234@cluster0.pg9lbmp.mongodb.net/?retryWrites=true&w=majority';
+const dbURI = 'mongodb+srv://@cluster0.pg9lbmp.mongodb.net/?retryWrites=true&w=majority';
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true }, function () { console.log("connection attempt") })
 mongoose.connection.on("error", function (e) { console.log(e) })
 mongoose.connection.on("connected", function (e) { console.log("successfully connected to database") })
