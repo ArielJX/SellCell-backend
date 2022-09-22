@@ -10,6 +10,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 
 
 app.use(cors());
@@ -200,16 +201,6 @@ app.post('/register', (req, res) => {
     // The data is valid and now we can register the user
     let newUser = new UserProfile(req.body);
 
-    newUser.save()
-        .then((result) => {
-            console.log('register successful')
-        })
-        .catch((err) => {
-            console.log(err)
-        })
-    res.json(newUser);
-    console.log(req.body);
-
 
     //Hash the password
     bcrypt.genSalt(10, (err, salt) => {
@@ -217,6 +208,7 @@ app.post('/register', (req, res) => {
             if (err) throw err;
             newUser.password = hash;
             newUser.save().then(user => {
+                console.log("Registration successful")
                 return res.status(201).json({
                     success: true,
                     msg: "User is now registered"
@@ -225,6 +217,61 @@ app.post('/register', (req, res) => {
         });
     });
 });
+
+
+//pass on username after login
+app.get('/login/:id', (req, res) => {
+    UserProfile.findById(({ _id: req.params.id }), function (err, docs) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            res.json(docs);
+        }
+    });
+});
+
+
+
+// login endpoint 
+app.post('/login', (req, res) => {
+    UserProfile.findOne({ username: req.body.username }).then(user => {
+        if (!user) {
+            return res.status(404).json({
+                message: "Username is not found",
+                success: false
+            });
+        }
+        //If there is a user, we are now going to confirm password
+        bcrypt.compare(req.body.password, user.password).then(isMatch => {
+            if (isMatch) {
+                //user's password is correct and we need to send the JSON Token for that user
+                const payload = {
+                    _id: user._id,
+                    username: user.username,
+                    email: user.email
+                }
+                jwt.sign(payload, {
+                    expiresIn: 604800
+                }, (err, token) => {
+                    console.log("login successful")
+                    res.status(200).json({
+                        _id: user._id,
+                        success: true,
+                        token: `Bearer ${token}`,
+                        message: "Hurry! Your are now logged in.",
+                        username: user.username
+                    });
+                })
+            } else {
+                return res.status().json({
+                    message: "password incorrect",
+                    success: false
+                });
+            }
+        })
+    });
+})
 
 
 
